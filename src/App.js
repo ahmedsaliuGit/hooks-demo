@@ -1,35 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import axios from "axios";
 
 function App() {
   const [data, setData] = useState({ hits: [] });
-  const [query, setQuery] = useState('redux');
-  const [value, setValue] = useState('')
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    setQuery(value);
-  }
+  const [query, setQuery] = useState("redux");
+  const [url, setUrl] = useState(
+    `https://hn.algolia.com/api/v1/search?query=redux`
+  );
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get(
-        "https://hn.algolia.com/api/v1/search?query=" + query
-      );
-      console.log("WHATISGOINGONHERE::", res.data);
+      const res = await axios.get(url);
+
       setData(res.data);
     };
 
     fetchData();
-  }, [query]);
+  }, [url]);
 
   return (
-    <div className="App">
-      <form noValidate onSubmit={handleSubmit}>
-        <input type='text' name='query' value={value} onChange={(e) => setValue(e.target.value)} />
-        <button type='submit'>By query</button>
-      </form>
+    <Fragment>
+      <input
+        type="text"
+        name="query"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <button
+        onClick={() => 
+          setUrl(`https://hn.algolia.com/api/v1/search?query=${query}`)
+        }
+        type="button"
+      >
+        Search
+      </button>
+
       <ul>
         {data.hits.map((item) => (
           <li key={item.objectID}>
@@ -37,7 +42,7 @@ function App() {
           </li>
         ))}
       </ul>
-    </div>
+    </Fragment>
   );
 }
 
